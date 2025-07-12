@@ -5,7 +5,13 @@
 
 "use client";
 
-import { createContext, useContext, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect,
+} from "react";
 import { UserInfo } from "@/types";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 
@@ -14,6 +20,7 @@ interface UserContextType {
   setUser: (user: UserInfo | null) => void;
   isAuthenticated: boolean;
   clearUser: () => void;
+  isLoading: boolean; // Add loading state to handle hydration
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -23,18 +30,26 @@ interface UserProviderProps {
 }
 
 export function UserProvider({ children }: UserProviderProps) {
+  const [mounted, setMounted] = useState(false);
   const [user, setUser, clearUser] = useLocalStorage<UserInfo | null>(
     "user-info",
     null
   );
 
-  const isAuthenticated = Boolean(user?.username && user?.jobTitle);
+  // Prevent hydration mismatch by waiting for component to mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Only check authentication after component is mounted on client
+  const isAuthenticated = mounted && Boolean(user?.username && user?.jobTitle);
 
   const contextValue: UserContextType = {
-    user,
+    user: mounted ? user : null, // Return null during SSR
     setUser,
     isAuthenticated,
     clearUser,
+    isLoading: !mounted, // Loading while hydrating
   };
 
   return (
