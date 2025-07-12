@@ -1,6 +1,6 @@
-# Leonardo.Ai Web Challenge
+#  Web Challenge
 
-A modern Next.js application showcasing anime data through GraphQL integration, built as part of the Leonardo.Ai technical challenge.
+A modern Next.js application showcasing anime data through GraphQL integration, built as part of the technical challenge.
 
 ## 🚀 Features
 
